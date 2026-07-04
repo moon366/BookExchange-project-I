@@ -6,93 +6,391 @@ BookExchange is a PHP/MySQL marketplace for buying and selling second-hand books
 
 ## What it solves
 
-- **No dedicated book marketplace** for Nepali readers — BookExchange fills that gap with district-based local listings.
+- **No dedicated book marketplace** for Nepali readers — BookExchange fills that gap with district-based local listings across all 77 districts of Nepal.
 - **Cumbersome selling workflows** — simplified listing form with price suggestions, drag-and-drop image upload, and savings calculator.
-- **Hard to find local books** — filter by district (all 77 Nepal districts grouped by province) and condition (New/Used).
+- **Hard to find local books** — filter by district (grouped by 7 provinces) and condition (New/Used).
 - **No visibility into orders** — unified dashboard showing stats, listings, orders, earnings, and recent activity.
+- **Zero cost for students** — built for XAMPP, no paid dependencies, fully custom frontend and backend.
 
-## Key Features
+---
 
-- **Browse** — search by title/author, filter by New/Used condition and district, responsive card grid with image zoom and condition badges
-- **Sell** — modern card form with sections (Book Info, Condition, Pricing, Location), drag-and-drop image upload, condition chips, price suggestion API, savings calculation, description character counter
-- **Dashboard** — welcome header with avatar, 4 stat cards (listings/orders/sold/earnings), listings grid with Edit/Mark Sold/Delete actions, orders list with status badges, quick actions panel, recent activity timeline
-- **My Listings** — card layout with image overlay badges (condition + status), zoom hover, Edit/Delete with inline modal
-- **Orders** — buyer and seller order management with status tabs, inline status updates
-- **Purchase History** — completed purchases with seller info and prices
-- **Book Details** — full detail view with image, price, condition, location, seller info, and order placement
-- **Responsive** — fully adaptive layout for desktop, tablet, and mobile
+## Features in Detail
+
+### 1. User Authentication
+- **Registration** — name, email, phone, password with validation
+- **Login/Logout** — session-based auth, protected routes via `auth_check.php`
+- **User menu** — dropdown in header with links to Dashboard, My Listings, Orders, Purchase History, Logout
+
+### 2. Browse Books (`/pages/browse.php`)
+- **Search** — real-time search by title or author
+- **Filters** — condition dropdown (New/Used), district dropdown (77 districts grouped by 7 provinces)
+- **Results grid** — responsive auto-fill cards with:
+  - Cover image with zoom hover effect
+  - Condition badge (green for New, amber for Used)
+  - Price, title, author
+  - Location + seller name in card footer
+- **Skeleton loaders** — shimmer animation while books load
+- **URL params** — filter state persisted in query string on page load
+
+### 3. Sell a Book (`/pages/sell-book.php`)
+- **Book Information** — title (required), author, description with 2000-character counter
+- **Book Condition** — chip-style radio buttons (New / Used), condition notes text field
+- **Pricing** — selling price with `$` prefix, original price, auto-calculated savings display
+- **Price Suggestion** — on condition select, fetches `suggest_price.php` API and shows average market price range
+- **Location** — district dropdown (all 77 Nepal districts) + specific location text field
+- **Cover Image** — drag-and-drop upload zone with preview thumbnail and remove button
+- **Form validation** — inline, required field indicators, loading state on submit
+- **Gradient submit button** — full-width, hover lift effect, loading spinner
+
+### 4. Dashboard (`/pages/dashboard.php`)
+- **Welcome header** — user avatar (first initial), greeting, subtitle
+- **4 Stat Cards** — computed live from API data:
+  - 📚 Listed Books — total count of user's listings
+  - 📦 Active Orders — pending/confirmed/shipped orders count
+  - ✅ Books Sold — completed sales count
+  - 💰 Total Earnings — sum of completed sale prices
+- **My Listings section** — responsive card grid (up to 6) with:
+  - Cover image (180px fixed height, object-fit cover)
+  - Condition badge overlay
+  - Title, author, price, status badge
+  - Action buttons: Edit (inline modal), Mark Sold (status change), Delete (confirmation)
+- **My Orders section** — order rows with:
+  - Book title, buyer/seller name, date, status badge, role tag (Sale/Purchase)
+  - Empty state with "Browse Books" CTA
+- **Quick Actions panel** — buttons linking to Sell, Browse, My Listings, Orders
+- **Recent Activity** — synthesized timeline from listings and orders, with colored dots (blue = listing, green = order), sorted by date
+
+### 5. My Listings (`/pages/my-listings.php`)
+- **Card grid** — same design as browse cards with:
+  - Image overlay badges (condition + status)
+  - Zoom hover effect
+  - Price, title, author
+  - Edit / Delete buttons
+- **Edit Modal** — inline popup form with:
+  - Title, author, description, condition, price, district, location
+  - Optional image replacement
+  - Save / Cancel buttons
+- **Delete** — confirmation dialog, calls `delete_book.php` API
+
+### 6. Book Details (`/pages/book-details.php`)
+- Large cover image, title, author, description
+- Price with original price strikethrough + savings percentage
+- Condition badge, condition notes
+- Location (district + specific location)
+- Seller name, email, phone
+- Place Order button (triggers `place_order.php`)
+
+### 7. Orders (`/pages/orders.php`)
+- **Tabs** — filter by status: All, Pending, Confirmed, Shipped, Completed, Cancelled
+- **Split views** — toggle between "As Buyer" and "As Seller"
+- **Order cards** — book info, partner name, price, delivery location, status badge
+- **Status updates** — sellers can advance order status (pending → confirmed → shipped → completed)
+- **Delivery location** — buyers can finalize location after confirmation
+- **Reviews** — buyers can leave a review after completion
+
+### 8. Purchase History (`/pages/purchase-history.php`)
+- Completed purchases with seller info, price comparison (paid vs original), purchase date
+
+### 9. Homepage (`/pages/index.php`)
+- **Hero** — two-column layout: heading (48px), description, CTA buttons (Browse Books / Sell a Book) + custom SVG book illustration
+- **Features** — 3 cards (Browse, Sell, Local Exchange) with hover lift effect
+- **Recently Added Books** — fetched from API, up to 6 books with image, title, price, condition badge, location. Shimmer skeleton while loading
+- **How It Works** — 3-step horizontal section (List → Find a Buyer → Exchange Safely) with numbered blue circles
+
+### 10. Responsive Design
+- Desktop (1200px+): full multi-column layouts
+- Tablet (900px): stacked hero, 2-column stats, single sidebar
+- Mobile (720px): single column, compact cards, collapsible nav
+
+---
+
+## How It Works — User Flow
+
+### For Buyers
+```
+1. Visit Homepage → Browse Featured Books
+2. Search by title/author or filter by district/condition
+3. Click a book card → View full details (price, images, seller info, location)
+4. Click "Place Order" → Order created with "pending" status
+5. Wait for seller to confirm
+6. After seller confirms → Finalize delivery location
+7. Seller ships → Status becomes "shipped"
+8. Receive book → Confirm receipt → Status becomes "completed"
+9. Leave a review for the seller
+```
+
+### For Sellers
+```
+1. Register/Login → Navigate to "Sell a Book"
+2. Fill form (title, author, description, condition, price, location, image)
+3. Submit → Book listed with "available" status
+4. View listing in Dashboard or My Listings
+5. Receive order notification → Confirm or manage in Orders page
+6. Update status: pending → confirmed → shipped → completed
+7. Track earnings in Dashboard stat cards
+8. Edit listing details anytime, or mark as sold manually
+9. Delete listing if no longer available (no active orders)
+```
+
+---
+
+## Data Flow
+
+```
+┌─────────────┐     HTTP Request      ┌──────────────┐     PDO Query     ┌─────────┐
+│   Browser   │ ──────────────────►   │   PHP API    │ ───────────────► │  MySQL  │
+│  (JS fetch) │ ◄──────────────────   │  (api/*.php) │ ◄─────────────── │ (XAMPP) │
+└─────────────┘     JSON Response     └──────────────┘                  └─────────┘
+       │                                      │
+       │                                      │
+       ▼                                      ▼
+  Renders HTML                          Validates Input
+  via innerHTML                          Checks Auth Token
+  or page load                           Processes Data
+                                         Returns JSON
+```
+
+### Page Load Flow
+```
+Browser loads page (e.g., browse.php)
+  → PHP renders initial HTML shell (header, container, footer)
+  → CSS loads (style.css)
+  → JavaScript loads (api.js, auth.js, pages-specific JS)
+  → JS fires fetch() to API endpoint
+  → API queries MySQL via PDO
+  → API returns JSON
+  → JS renders data into DOM (cards, tables, stats)
+  → User sees complete UI
+```
+
+### Book Listing Flow
+```
+Seller fills sell form
+  → JavaScript collects FormData (text fields + image file)
+  → POST to api/add_book.php
+  → PHP validates session, sanitizes inputs
+  → Moves uploaded image to /uploads/
+  → INSERT INTO books table
+  → Returns JSON { success: true, book_id: X }
+  → JS shows success message, resets form
+  → Book now visible on Browse page and seller's Dashboard
+```
+
+### Order Flow
+```
+Buyer clicks "Place Order" on book-details.php
+  → POST to api/place_order.php
+  → PHP checks book availability, creates order
+  → INSERT INTO orders (buyer_id, seller_id, book_id, price, status='pending')
+  → Updates book status to 'pending'
+  → Seller sees order in Dashboard and Orders page
+  → Seller updates status via api/update_order_status.php
+  → Status progresses: pending → confirmed → shipped → completed
+  → Each update: UPDATE orders SET status = ? WHERE id = ?
+```
+
+### Search & Filter Flow
+```
+User types search or selects filter on browse page
+  → JavaScript reads form values (search, condition, district)
+  → Builds query string: ?search=xyz&condition=new&district=Kathmandu
+  → fetch() to api/get_books.php with query string
+  → PHP builds SQL with WHERE clauses + LIKE for search
+  → Returns filtered books as JSON array
+  → JS clears current grid, re-renders with new data
+  → URL updated via history.replaceState for bookmarkable filters
+```
+
+### Price Suggestion Flow
+```
+Seller selects condition (New/Used) on sell form
+  → JS fires GET to api/suggest_price.php?condition=new
+  → PHP calculates average price of available books with same condition
+  → Returns { suggested: 15.50, count: 12, range_min: 5.00, range_max: 30.00 }
+  → JS displays suggestion box below condition chips
+```
+
+### Dashboard Stats Flow
+```
+Dashboard loads
+  → Three parallel fetch() calls:
+      1. api/get_books.php?seller_id=X  → user's listings
+      2. api/get_orders.php?role=buyer  → user's purchase orders
+      3. api/get_orders.php?role=seller → user's sale orders
+  → JS computes:
+      - stat-listings: listings.length
+      - stat-orders: orders.filter(pending/confirmed/shipped).length
+      - stat-sold: sellerOrders.filter(completed).length
+      - stat-earnings: sellerOrders.filter(completed).reduce(price sum)
+  → Updates DOM textContent of each stat number
+  → Also renders listings grid, order rows, and activity timeline
+```
+
+---
+
+## Database Schema
+
+### Table: `users`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | INT (PK, AUTO_INCREMENT) | User ID |
+| name | VARCHAR(100) | Full name |
+| email | VARCHAR(255) UNIQUE | Login email |
+| phone | VARCHAR(20) | Contact number |
+| password | VARCHAR(255) | Hashed password |
+| created_at | TIMESTAMP | Registration date |
+
+### Table: `categories`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | INT (PK, AUTO_INCREMENT) | Category ID |
+| name | VARCHAR(100) | Category name |
+
+### Table: `books`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | INT (PK, AUTO_INCREMENT) | Book ID |
+| seller_id | INT (FK → users.id) | Listing owner |
+| category_id | INT (FK → categories.id) | Book category (nullable) |
+| title | VARCHAR(200) | Book title |
+| author | VARCHAR(100) | Author name |
+| description | TEXT | Book description |
+| condition_type | ENUM('new','used') | New or Used |
+| condition_notes | VARCHAR(255) | Additional notes |
+| price | DECIMAL(10,2) | Selling price |
+| original_price | DECIMAL(10,2) | Original price (nullable) |
+| district | VARCHAR(100) | Nepal district |
+| location | VARCHAR(255) | Specific location |
+| image_url | VARCHAR(500) | Cover image path |
+| status | ENUM('available','pending','sold') | Listing status |
+| created_at | TIMESTAMP | Listing date |
+
+### Table: `orders`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | INT (PK, AUTO_INCREMENT) | Order ID |
+| book_id | INT (FK → books.id) | Ordered book |
+| buyer_id | INT (FK → users.id) | Buyer |
+| seller_id | INT (FK → users.id) | Seller |
+| price | DECIMAL(10,2) | Purchase price |
+| status | ENUM('pending','confirmed','shipped','completed','cancelled') | Order status |
+| delivery_location | VARCHAR(255) | Buyer's delivery address |
+| location_finalized | TINYINT(1) | Whether location is set |
+| created_at | TIMESTAMP | Order date |
+
+### Table: `reviews`
+| Column | Type | Purpose |
+|--------|------|---------|
+| id | INT (PK, AUTO_INCREMENT) | Review ID |
+| order_id | INT (FK → orders.id) | Associated order |
+| reviewer_id | INT (FK → users.id) | Who wrote the review |
+| rating | TINYINT(1) | 1-5 star rating |
+| comment | TEXT | Review text |
+| created_at | TIMESTAMP | Review date |
+
+---
+
+## API Endpoints
+
+| Endpoint | Method | Auth | Input | Output | Purpose |
+|----------|--------|------|-------|--------|---------|
+| `get_books.php` | GET | No | `?search=&condition=&district=&seller_id=` | `[{book}]` | List/filter books |
+| `get_book.php` | GET | No | `?id=N` | `{book}` | Single book details |
+| `add_book.php` | POST | Yes | FormData (fields + image) | `{success, book_id}` | Create listing |
+| `update_book.php` | POST | Yes | FormData + `id` | `{success}` | Update listing |
+| `delete_book.php` | DELETE | Yes | `{"id": N}` | `{success}` | Delete listing |
+| `mark_sold.php` | POST | Yes | `{"id": N}` | `{success}` | Mark listing sold |
+| `suggest_price.php` | GET | No | `?condition=new/used` | `{suggested, count, range_min, range_max}` | Price suggestion |
+| `get_orders.php` | GET | Yes | `?role=buyer/seller` | `[{order}]` | User's orders |
+| `place_order.php` | POST | Yes | `{"book_id": N}` | `{success, order_id}` | Place order |
+| `update_order_status.php` | POST | Yes | `{"order_id": N, "status": "..."}` | `{success}` | Change status |
+| `finalize_location.php` | POST | Yes | `{"order_id": N, "location": "..."}` | `{success}` | Set delivery address |
+| `get_purchased_books.php` | GET | Yes | — | `[{purchase}]` | Completed purchases |
+| `get_seller_reviews.php` | GET | No | `?seller_id=N` | `[{review}]` | Seller reviews |
+| `add_review.php` | POST | Yes | `{"order_id": N, "rating": N, "comment": "..."}` | `{success}` | Submit review |
+| `login.php` | POST | No | `{"email": "...", "password": "..."}` | `{success, user}` | User login |
+| `register.php` | POST | No | `{"name": "...", "email": "...", ...}` | `{success, user}` | User registration |
+| `logout.php` | POST | No | — | `{success}` | End session |
+
+---
 
 ## Project Structure
 
 ```
 book-exchange/
-├── pages/          # Frontend pages (index, browse, sell-book, dashboard, etc.)
-├── api/            # REST endpoints (get_books, add_book, update_book, orders, etc.)
-├── css/            # Single stylesheet (style.css) with all component styles
-├── js/             # API helper (api.js) and auth (auth.js)
-├── includes/       # Shared header, footer, auth check
-├── config/         # Database connection (db.php)
-├── uploads/        # Book cover images
-└── database/       # Schema SQL
+├── pages/              # Frontend page templates (PHP)
+│   ├── index.php           # Homepage — hero, features, recent books, steps
+│   ├── browse.php          # Browse & filter books
+│   ├── sell-book.php       # Sell form with drag-drop upload
+│   ├── dashboard.php       # User dashboard with stats
+│   ├── my-listings.php     # Listing management
+│   ├── book-details.php    # Single book view
+│   ├── orders.php          # Order management
+│   ├── purchase-history.php# Completed purchases
+│   ├── login.php           # Login form
+│   ├── register.php        # Registration form
+│   └── cart.php            # Cart (reserved)
+├── api/                # Backend REST endpoints (PHP)
+│   ├── get_books.php       # List/filter books
+│   ├── get_book.php        # Single book
+│   ├── add_book.php        # Create listing
+│   ├── update_book.php     # Update listing
+│   ├── delete_book.php     # Delete listing
+│   ├── mark_sold.php       # Mark as sold
+│   ├── suggest_price.php   # Price suggestion
+│   ├── get_orders.php      # List orders
+│   ├── place_order.php     # Create order
+│   ├── update_order_status.php
+│   ├── finalize_location.php
+│   ├── get_purchased_books.php
+│   ├── get_seller_reviews.php
+│   ├── add_review.php
+│   ├── login.php
+│   ├── register.php
+│   └── logout.php
+├── css/
+│   └── style.css       # All styles (~2700 lines)
+├── js/
+│   ├── api.js          # Fetch wrapper (apiGet, apiPost)
+│   ├── auth.js         # Auth menu, logout, navigation
+│   ├── books.js        # Browse page logic
+│   ├── orders.js       # Orders page logic
+│   └── cart.js         # Cart (reserved)
+├── includes/
+│   ├── header.php      # HTML head, nav bar, opening <main>
+│   ├── footer.php      # Footer, closing tags, JS includes
+│   └── auth_check.php  # Session guard for API routes
+├── config/
+│   └── db.php          # PDO MySQL connection
+├── uploads/            # Book cover images
+│   └── placeholder.svg # Default image
+├── database/
+│   └── schema.sql      # Full table definitions
+├── .gitignore
+└── README.md
 ```
 
-## Pages
-
-| Route | Description |
-|-------|-------------|
-| `/pages/index.php` | Homepage — hero with illustration, features, recently added books (API-fetched), how-it-works steps |
-| `/pages/browse.php` | Browse books — search, condition/district filters, responsive grid with skeletons |
-| `/pages/sell-book.php` | Sell form — sections, chips, drag-drop upload, price suggestion, savings calc |
-| `/pages/dashboard.php` | User dashboard — stats, listings (edit/mark sold/delete), orders, activity, quick actions |
-| `/pages/my-listings.php` | Full listing management — card grid, edit/delete with modal |
-| `/pages/book-details.php` | Single book view — details, seller info, order button |
-| `/pages/orders.php` | Order management — tabs (pending/confirmed/shipped/completed), status updates |
-| `/pages/purchase-history.php` | Completed purchases list |
-| `/pages/login.php` | Login form |
-| `/pages/register.php` | Registration form |
-
-## API Endpoints
-
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `get_books.php` | GET | List books (filter by search, condition, district, seller_id) |
-| `get_book.php` | GET | Single book details |
-| `add_book.php` | POST | Create listing (multipart with image) |
-| `update_book.php` | POST | Update listing |
-| `delete_book.php` | DELETE | Remove listing (JSON body) |
-| `mark_sold.php` | POST | Mark listing as sold (JSON body) |
-| `suggest_price.php` | GET | Price suggestion by condition |
-| `get_orders.php` | GET | Orders by role (buyer/seller) |
-| `place_order.php` | POST | Place new order |
-| `update_order_status.php` | POST | Change order status |
-| `finalize_location.php` | POST | Finalize delivery location |
-| `get_purchased_books.php` | GET | Completed purchases |
-| `get_seller_reviews.php` | GET | Reviews for a seller |
-| `add_review.php` | POST | Add review for an order |
-| `login.php` | POST | User login |
-| `register.php` | POST | User registration |
-| `logout.php` | POST | User logout |
-
-## Database
-
-- **Database**: `book_exchange` (MySQL via XAMPP)
-- **Tables**: `users`, `categories`, `books`, `orders`, `reviews`
-- **Books** include: title, author, description, condition_type (new/used), condition_notes, price, original_price, district (77 Nepal districts), location, image_url, status (available/pending/sold)
-- **Orders** track: book_id, buyer_id, seller_id, price, status, delivery_location, location_finalized
+---
 
 ## Setup
 
 1. Start Apache + MySQL via XAMPP.
-2. Create a MySQL database and import `database/schema.sql`.
-3. Update `config/db.php` if needed (default: root, no password, `book_exchange`).
-4. Place the project under `S:\xmpp\htdocs\book-exchange\`.
-5. Open `http://localhost/book-exchange/pages/index.php` in a browser.
-6. Register an account and start listing or browsing books.
+2. Open phpMyAdmin, create a database named `book_exchange`.
+3. Import `database/schema.sql` into the `book_exchange` database.
+4. Place the project folder under `S:\xmpp\htdocs\book-exchange\`.
+5. Update `config/db.php` if your MySQL credentials differ (default: root, no password).
+6. Open `http://localhost/book-exchange/pages/index.php` in a browser.
+7. Register a new account.
+8. Start browsing or listing books.
+
+---
 
 ## Tech Stack
 
 - **Backend**: PHP 8+, MySQL (PDO)
-- **Frontend**: Vanilla JavaScript (ES6+), CSS3 (custom properties, grid, flexbox, animations)
+- **Frontend**: Vanilla JavaScript (ES6+ fetch, async/await, DOM manipulation)
+- **Styling**: CSS3 (custom properties, Grid, Flexbox, animations, media queries)
 - **Typography**: Inter (system-ui fallback)
 - **Design tokens**: Blue primary (#2563EB), light gray background (#F8FAFC), white cards with subtle shadows, 16px border-radius
-- **No external CSS/JS frameworks** — fully custom implementation
+- **Zero external dependencies** — no Bootstrap, jQuery, or CSS frameworks
+- **Server**: XAMPP (Apache + MySQL + PHP)
