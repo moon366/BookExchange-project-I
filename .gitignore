@@ -1,0 +1,6 @@
+uploads/*
+!uploads/placeholder.svg
+*.log
+.env
+.DS_Store
+Thumbs.db
