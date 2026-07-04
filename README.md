@@ -372,6 +372,15 @@ book-exchange/
 
 ---
 
+## Screenshots
+
+| | |
+|---|---|
+| ![Home](screenshot/home.png) | ![Browse](screenshot/browse.png) |
+| ![Sell Form](screenshot/sell%20form.png) | ![Dashboard](screenshot/dashboard.png) |
+| ![My Listings](screenshot/my-listing.png) | ![Orders](screenshot/order.png) |
+| ![Login](screenshot/login.png) | ![Register](screenshot/register.png) |
+
 ## Setup
 
 1. Start Apache + MySQL via XAMPP.
