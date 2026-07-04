@@ -292,25 +292,25 @@ Dashboard loads
 
 ## API Endpoints
 
-| Endpoint | Method | Auth | Input | Output | Purpose |
-|----------|--------|------|-------|--------|---------|
-| `get_books.php` | GET | No | `?search=&condition=&district=&seller_id=` | `[{book}]` | List/filter books |
-| `get_book.php` | GET | No | `?id=N` | `{book}` | Single book details |
-| `add_book.php` | POST | Yes | FormData (fields + image) | `{success, book_id}` | Create listing |
-| `update_book.php` | POST | Yes | FormData + `id` | `{success}` | Update listing |
-| `delete_book.php` | DELETE | Yes | `{"id": N}` | `{success}` | Delete listing |
-| `mark_sold.php` | POST | Yes | `{"id": N}` | `{success}` | Mark listing sold |
-| `suggest_price.php` | GET | No | `?condition=new/used` | `{suggested, count, range_min, range_max}` | Price suggestion |
-| `get_orders.php` | GET | Yes | `?role=buyer/seller` | `[{order}]` | User's orders |
-| `place_order.php` | POST | Yes | `{"book_id": N}` | `{success, order_id}` | Place order |
-| `update_order_status.php` | POST | Yes | `{"order_id": N, "status": "..."}` | `{success}` | Change status |
-| `finalize_location.php` | POST | Yes | `{"order_id": N, "location": "..."}` | `{success}` | Set delivery address |
-| `get_purchased_books.php` | GET | Yes | — | `[{purchase}]` | Completed purchases |
-| `get_seller_reviews.php` | GET | No | `?seller_id=N` | `[{review}]` | Seller reviews |
-| `add_review.php` | POST | Yes | `{"order_id": N, "rating": N, "comment": "..."}` | `{success}` | Submit review |
-| `login.php` | POST | No | `{"email": "...", "password": "..."}` | `{success, user}` | User login |
-| `register.php` | POST | No | `{"name": "...", "email": "...", ...}` | `{success, user}` | User registration |
-| `logout.php` | POST | No | — | `{success}` | End session |
+| Endpoint | Method | Feature |
+|----------|--------|---------|
+| `get_books.php` | GET | List/filter books by search, condition, district, seller |
+| `get_book.php` | GET | Single book details by ID |
+| `add_book.php` | POST | Create a new book listing with image |
+| `update_book.php` | POST | Update existing listing details |
+| `delete_book.php` | DELETE | Remove a listing |
+| `mark_sold.php` | POST | Mark a listing as sold |
+| `suggest_price.php` | GET | Price suggestion based on condition |
+| `get_orders.php` | GET | List orders for buyer or seller |
+| `place_order.php` | POST | Place a new order on a book |
+| `update_order_status.php` | POST | Advance order status |
+| `finalize_location.php` | POST | Set delivery location for an order |
+| `get_purchased_books.php` | GET | List completed purchases |
+| `get_seller_reviews.php` | GET | Get reviews for a seller |
+| `add_review.php` | POST | Submit a review for an order |
+| `login.php` | POST | Authenticate and log in |
+| `register.php` | POST | Create a new account |
+| `logout.php` | POST | End the current session |
 
 ---
 
